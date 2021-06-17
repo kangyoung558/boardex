@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+		
+		<bean class="com.momtenting.security.CustomAccessDeniedHandler" id="accessDeniedHandler"/>
+		<bean class="com.momtenting.security.CustomNoOpPasswordEncoder" id="passwordEncoder"/>
+		<bean class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" id="BCryptPasswordEncoder"></bean>
+		<bean class="com.momtenting.security.CustomUserDetailsService" id="customUserDetailsService"></bean>
+		<security:http>
+			<security:intercept-url pattern="/sample/all" access="permitAll"/>
+			<security:intercept-url pattern="/sample/member" access="hasRole('ROLE_MEMBER')"/>
+			<security:intercept-url pattern="/sample/admin" access="hasRole('ROLE_ADMIN')"/>
+			<security:form-login login-page="/customLogin"/>
+			<security:access-denied-handler ref="accessDeniedHandler"/>
+			<security:logout logout-url="/customLogout" delete-cookies="JSESSIONID,remember-me" logout-success-url="/"/>
+			<security:remember-me data-source-ref="dataSource" token-validity-seconds="604800"/>
+			<!-- <security:access-denied-handler error-page="/accessError"/> -->
+			<!-- <security:csrf disabled="true"/> -->
+		</security:http>
+		
+		<security:authentication-manager>
+			<security:authentication-provider user-service-ref="customUserDetailsService">
+				<security:password-encoder ref="BCryptPasswordEncoder"/>
+				<!-- <security:user-service>
+					<security:user name="member"  password="{noop}member" authorities="ROLE_MEMBER"/>
+					<security:user name="admin"  password="{noop}admin" authorities="ROLE_MEMBER, ROLE_ADMIN"/>
+				</security:user-service> -->
+				<!-- <security:jdbc-user-service data-source-ref="dataSource"
+					users-by-username-query="select userid username, userpw password, enabled from tbl_member where userid = ?"
+					authorities-by-username-query="select userid username, auth authority from tbl_member_auth where userid = ?"
+				/> -->
+				<!-- <security:password-encoder ref="passwordEncoder"/> -->
+			</security:authentication-provider>
+		</security:authentication-manager>
+
+</beans>

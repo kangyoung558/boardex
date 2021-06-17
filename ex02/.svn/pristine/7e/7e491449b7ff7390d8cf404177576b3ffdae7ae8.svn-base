@@ -1,0 +1,51 @@
+package com.momtenting.controller;
+
+import java.io.File;
+import java.io.IOException;
+
+import javax.servlet.ServletContext;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.multipart.MultipartFile;
+
+import lombok.extern.log4j.Log4j;
+
+@Controller
+@Log4j
+public class UploadController {
+	private ServletContext ServletContext;
+	
+	public void setServletContext(ServletContext servletContext) {
+		this.ServletContext = servletContext;
+	}
+	
+	@GetMapping("upload")
+	public void uploadForm() {
+		log.info("upload get.....");
+	}
+	
+	
+	@PostMapping("uploadAction")
+	public void upload(MultipartFile[] files, Model model) throws IllegalStateException, IOException {
+		
+//		String uploadFolder = ServletContext.getRealPath("upload");
+		String uploadFolder = "C:/20201230/upload";
+		
+		log.info("upload post.....");
+		for(MultipartFile mf : files) {
+			log.info(".....................");
+			log.info("upload file name :: " + mf.getOriginalFilename());
+			log.info("upload file size :: " + mf.getSize());
+			log.info(".....................");
+			
+			File saveFile = new File(uploadFolder, mf.getOriginalFilename());
+			mf.transferTo(saveFile);
+			
+			
+		}
+	}
+	
+}
